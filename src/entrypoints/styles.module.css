@@ -1,3 +1,10 @@
-.inspector {
+.buttonItem {
   margin-top: var(--spacing-l);
+}
+.hidden {
+  display: none;
+}
+.buttonList {
+  display: flex;
+  flex-direction: column;
 }

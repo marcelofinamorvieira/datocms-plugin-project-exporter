@@ -1,13 +1,29 @@
 {
-  "name": "export-record",
+  "name": "datocms-plugin-project-exporter",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "homepage": "https://github.com/mark/foobar#readme",
+  "description": "A plugin that allows you to export records and assets from your project directly from your browser",
+  "keywords": [
+    "datocms-plugin"
+  ],
+  "datoCmsPlugin": {
+    "title": "Project Exporter",
+    "coverImage": "docs/cover.png",
+    "previewImage": "docs/preview.mp4",
+    "entryPoint": "build/index.html",
+    "permissions": [
+      "currentUserAccessToken"
+    ]
+  },
   "dependencies": {
+    "@datocms/cma-client-browser": "^1.2.9",
     "@types/node": "^18.15.11",
     "@types/react": "^18.0.32",
     "@types/react-dom": "^18.0.11",
     "datocms-plugin-sdk": "^0.7.4",
     "datocms-react-ui": "^0.7.4",
+    "jszip": "^3.10.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -39,11 +55,5 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3"
-  },
-  "datoCmsPlugin": {
-    "title": "",
-    "previewImage": "",
-    "coverImage": "",
-    "entryPoint": "build/index.html"
   }
 }
