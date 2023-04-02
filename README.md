@@ -1,3 +1,4 @@
-# [Your plugin name]
+# Project Exporter
 
-[Describe what your plugin does, and how users you can configure it! Screenshots are always welcome!]
+A plugin that allows you to download all of your records and assets from your DatoCMS project directly from your dashboard.
+You can also download specifical records through their sidebar.
