@@ -1,6 +1,6 @@
 {
   "name": "datocms-plugin-project-exporter",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": false,
   "homepage": "https://github.com/marcelofinamorvieira/datocms-plugin-project-exporter",
   "description": "A plugin that allows you to export records and assets from your project directly from your browser",
