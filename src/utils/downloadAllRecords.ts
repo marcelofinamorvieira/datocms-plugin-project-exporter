@@ -19,7 +19,9 @@ export default async function downloadAllRecords(
       records.push(record);
     }
   } else {
-    for await (const record of client.items.listPagedIterator()) {
+    for await (const record of client.items.listPagedIterator({
+      nested: 'true',
+    })) {
       records.push(record);
     }
   }
