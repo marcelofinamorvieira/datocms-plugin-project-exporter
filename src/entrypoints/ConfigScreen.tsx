@@ -1,5 +1,16 @@
 import { RenderConfigScreenCtx } from 'datocms-plugin-sdk';
-import { Button, Canvas, SelectField, Spinner } from 'datocms-react-ui';
+import {
+  Button,
+  Canvas,
+  CaretDownIcon,
+  CaretUpIcon,
+  Dropdown,
+  DropdownMenu,
+  DropdownOption,
+  DropdownSeparator,
+  SelectField,
+  Spinner,
+} from 'datocms-react-ui';
 import s from './styles.module.css';
 import { useEffect, useState } from 'react';
 import downloadAllRecords from '../utils/downloadAllRecords';
@@ -15,10 +26,15 @@ type ModelObject = {
   id: string;
 };
 
+export type AvailableFormats = 'JSON' | 'CSV' | 'XML';
+
 export default function ConfigScreen({ ctx }: Props) {
   const [isLoading, setLoading] = useState(false);
   const [selectedModels, setSelectedModels] = useState<ModelObject[]>([]);
   const [allModels, setAllModels] = useState<ModelObject[]>([]);
+  const [selectedFormat, setSelectedFormat] = useState<AvailableFormats>(
+    (ctx.plugin.attributes.parameters.format as AvailableFormats) ?? 'JSON'
+  );
 
   useEffect(() => {
     const client = buildClient({
@@ -38,7 +54,10 @@ export default function ConfigScreen({ ctx }: Props) {
 
   const handleAllRecords = async () => {
     setLoading(true);
-    await downloadAllRecords(ctx.currentUserAccessToken as string);
+    await downloadAllRecords(
+      ctx.currentUserAccessToken as string,
+      selectedFormat
+    );
     setLoading(false);
   };
 
@@ -46,6 +65,7 @@ export default function ConfigScreen({ ctx }: Props) {
     setLoading(true);
     await downloadAllRecords(
       ctx.currentUserAccessToken as string,
+      selectedFormat,
       selectedModels.map((model) => model.id)
     );
     setLoading(false);
@@ -68,9 +88,84 @@ export default function ConfigScreen({ ctx }: Props) {
         <Spinner size={48} placement="centered" />
       </div>
       <div className={!isLoading ? s.buttonList : s.hidden}>
-        <div style={{ textAlign: 'center' }}>
-          You can download a specific record from its sidebar
+        <div
+          style={{
+            display: 'flex',
+            gap: '20px',
+            alignItems: 'center',
+            marginBottom: '20px',
+            textAlign: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <span style={{ fontSize: '16px' }}>Format for exports</span>
+          <Dropdown
+            renderTrigger={({ open, onClick }) => (
+              <Button
+                onClick={onClick}
+                rightIcon={open ? <CaretUpIcon /> : <CaretDownIcon />}
+              >
+                {selectedFormat}
+              </Button>
+            )}
+          >
+            <DropdownMenu>
+              <DropdownOption
+                onClick={() => {
+                  setSelectedFormat('JSON');
+                  ctx
+                    .updatePluginParameters({
+                      format: 'JSON',
+                    })
+                    .then(() => {
+                      ctx.notice('Format for exports updated');
+                    });
+                }}
+              >
+                JSON
+              </DropdownOption>
+              <DropdownOption
+                onClick={() => {
+                  setSelectedFormat('CSV');
+                  ctx
+                    .updatePluginParameters({
+                      format: 'CSV',
+                    })
+                    .then(() => {
+                      ctx.notice('Format for exports updated');
+                    });
+                }}
+              >
+                CSV
+              </DropdownOption>
+              <DropdownOption
+                onClick={() => {
+                  setSelectedFormat('XML');
+                  ctx
+                    .updatePluginParameters({
+                      format: 'XML',
+                    })
+                    .then(() => {
+                      ctx.notice('Format for exports updated');
+                    });
+                }}
+              >
+                XML
+              </DropdownOption>
+            </DropdownMenu>
+          </Dropdown>
         </div>
+        <div className={s.tooltipBox} style={{ textAlign: 'center' }}>
+          You can download a specific record from its own sidebar
+        </div>
+        <div
+          style={{
+            width: '100%',
+            height: '1px',
+            backgroundColor: '#e0e0e0',
+            margin: '20px 0',
+          }}
+        />
         <Button
           className={s.buttonItem}
           onClick={handleAllRecords}
