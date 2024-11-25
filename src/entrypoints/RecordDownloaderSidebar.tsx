@@ -9,7 +9,12 @@ type PropTypes = {
 
 export default function RecordDownloaderSidebar({ ctx }: PropTypes) {
   const downloadTxtFile = async () => {
-    const recordValue = ctx.formValues;
+    if (!ctx.item) {
+      ctx.alert('Save the record before trying to download it!');
+      return;
+    }
+
+    const recordValue = ctx.item;
 
     switch (ctx.plugin.attributes.parameters.format || 'JSON') {
       case 'JSON':

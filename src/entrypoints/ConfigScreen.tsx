@@ -7,7 +7,6 @@ import {
   Dropdown,
   DropdownMenu,
   DropdownOption,
-  DropdownSeparator,
   SelectField,
   Spinner,
 } from 'datocms-react-ui';
