@@ -9,6 +9,7 @@ import {
   DropdownOption,
   SelectField,
   Spinner,
+  TextField,
 } from 'datocms-react-ui';
 import s from './styles.module.css';
 import { useEffect, useState } from 'react';
@@ -25,7 +26,7 @@ type ModelObject = {
   id: string;
 };
 
-export type AvailableFormats = 'JSON' | 'CSV' | 'XML';
+export type AvailableFormats = 'JSON' | 'CSV' | 'XML' | 'XLSX';
 
 export default function ConfigScreen({ ctx }: Props) {
   const [isLoading, setLoading] = useState(false);
@@ -34,6 +35,7 @@ export default function ConfigScreen({ ctx }: Props) {
   const [selectedFormat, setSelectedFormat] = useState<AvailableFormats>(
     (ctx.plugin.attributes.parameters.format as AvailableFormats) ?? 'JSON'
   );
+  const [textQuery, setTextQuery] = useState('');
 
   useEffect(() => {
     const client = buildClient({
@@ -49,23 +51,16 @@ export default function ConfigScreen({ ctx }: Props) {
           })
       );
     });
-  }, []);
+  }, [ctx.currentUserAccessToken]);
 
-  const handleAllRecords = async () => {
+  const handleRecordDownload = async (
+    options: { modelIDs?: string[]; textQuery?: string } = {}
+  ) => {
     setLoading(true);
     await downloadAllRecords(
-      ctx.currentUserAccessToken as string,
-      selectedFormat
-    );
-    setLoading(false);
-  };
-
-  const handleSelectedRecords = async () => {
-    setLoading(true);
-    await downloadAllRecords(
-      ctx.currentUserAccessToken as string,
+      ctx.currentUserAccessToken!,
       selectedFormat,
-      selectedModels.map((model) => model.id)
+      options
     );
     setLoading(false);
   };
@@ -151,6 +146,20 @@ export default function ConfigScreen({ ctx }: Props) {
               >
                 XML
               </DropdownOption>
+              <DropdownOption
+                onClick={() => {
+                  setSelectedFormat('XLSX');
+                  ctx
+                    .updatePluginParameters({
+                      format: 'XLSX',
+                    })
+                    .then(() => {
+                      ctx.notice('Format for exports updated');
+                    });
+                }}
+              >
+                XLSX
+              </DropdownOption>
             </DropdownMenu>
           </Dropdown>
         </div>
@@ -165,13 +174,6 @@ export default function ConfigScreen({ ctx }: Props) {
             margin: '20px 0',
           }}
         />
-        <Button
-          className={s.buttonItem}
-          onClick={handleAllRecords}
-          disabled={isLoading}
-        >
-          Download all records from this project
-        </Button>
 
         <div className={s.modelSelectorContainer}>
           <div className={s.modelSelector}>
@@ -201,18 +203,46 @@ export default function ConfigScreen({ ctx }: Props) {
 
           <Button
             disabled={!selectedModels.length}
-            onClick={handleSelectedRecords}
+            onClick={() =>
+              handleRecordDownload({
+                modelIDs: selectedModels.map((model) => model.id),
+              })
+            }
             fullWidth
           >
-            Download from selected models
+            Download records from selected models
           </Button>
         </div>
+
+        <div className={s.textQueryContainer}>
+          <TextField
+            name="name"
+            id="name"
+            label=""
+            value={textQuery}
+            onChange={(newValue) => setTextQuery(newValue)}
+          />
+          <Button
+            disabled={!textQuery}
+            onClick={() => handleRecordDownload({ textQuery })}
+            fullWidth
+          >
+            Download records from text query
+          </Button>
+        </div>
+        <Button
+          className={s.buttonItem}
+          onClick={() => handleRecordDownload()}
+          disabled={isLoading}
+        >
+          Download all records
+        </Button>
         <Button
           onClick={handleAllAssets}
           className={s.buttonItem + ' ' + s.assetItem}
           disabled={isLoading}
         >
-          Download all assets from this project
+          Download all assets
         </Button>
         <div className={s.tooltipBox}>
           <span className={s.tooltipSpan}>

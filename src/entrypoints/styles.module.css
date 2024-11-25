@@ -58,6 +58,18 @@
   margin-top: var(--spacing-l);
   width: 100%;
   gap: var(--spacing-l);
+  text-align: center;
+}
+
+.textQueryContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: var(--spacing-m);
+  margin-bottom: var(--spacing-l);
+  margin-top: var(--spacing-l);
+  text-align: center;
 }
 
 .modelSelector {
