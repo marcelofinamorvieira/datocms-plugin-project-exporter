@@ -8,7 +8,6 @@ import {
   DropdownMenu,
   DropdownOption,
   SelectField,
-  Spinner,
   TextField,
 } from 'datocms-react-ui';
 import s from './styles.module.css';
@@ -16,6 +15,7 @@ import { useEffect, useState } from 'react';
 import downloadAllRecords from '../utils/downloadAllRecords';
 import downloadAllAssets from '../utils/downloadAllAssets';
 import { buildClient } from '@datocms/cma-client-browser';
+import LoadingOverlay from './LoadingOverlay';
 
 type Props = {
   ctx: RenderConfigScreenCtx;
@@ -30,6 +30,10 @@ export type AvailableFormats = 'JSON' | 'CSV' | 'XML' | 'XLSX';
 
 export default function ConfigScreen({ ctx }: Props) {
   const [isLoading, setLoading] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState('');
+  const [loadingProgress, setLoadingProgress] = useState<number | undefined>(
+    undefined
+  );
   const [selectedModels, setSelectedModels] = useState<ModelObject[]>([]);
   const [allModels, setAllModels] = useState<ModelObject[]>([]);
   const [selectedFormat, setSelectedFormat] = useState<AvailableFormats>(
@@ -57,31 +61,45 @@ export default function ConfigScreen({ ctx }: Props) {
     options: { modelIDs?: string[]; textQuery?: string } = {}
   ) => {
     setLoading(true);
+    setLoadingStatus('Initializing download...');
+    setLoadingProgress(0);
+
     await downloadAllRecords(
       ctx.currentUserAccessToken!,
       selectedFormat,
-      options
+      options,
+      (progress, msg) => {
+        setLoadingStatus(msg);
+        setLoadingProgress(progress);
+      }
     );
+
     setLoading(false);
+    setLoadingStatus('');
+    setLoadingProgress(undefined);
   };
 
   const handleAllAssets = async () => {
     setLoading(true);
+    setLoadingStatus('Initializing asset download...');
+    setLoadingProgress(undefined);
 
-    await downloadAllAssets(ctx.currentUserAccessToken as string);
+    await downloadAllAssets(
+      ctx.currentUserAccessToken as string,
+      (msg) => setLoadingStatus(msg)
+    );
 
     setLoading(false);
+    setLoadingStatus('');
+    setLoadingProgress(undefined);
   };
 
   return (
     <Canvas ctx={ctx}>
-      <div
-        className={isLoading ? '' : s.hidden}
-        style={{ height: '200px', position: 'relative' }}
-      >
-        <Spinner size={48} placement="centered" />
-      </div>
-      <div className={!isLoading ? s.buttonList : s.hidden}>
+      {isLoading && (
+        <LoadingOverlay status={loadingStatus} progress={loadingProgress} />
+      )}
+      <div className={s.buttonList}>
         <div
           style={{
             display: 'flex',

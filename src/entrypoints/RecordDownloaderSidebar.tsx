@@ -1,7 +1,5 @@
 import { RenderItemFormSidebarPanelCtx } from 'datocms-plugin-sdk';
 import { Button, Canvas } from 'datocms-react-ui';
-import { json2csv } from 'json-2-csv';
-import jsontoxml from 'jsontoxml';
 import downloadRecordsFile from '../utils/downloadRecordsFile';
 import { AvailableFormats } from './ConfigScreen';
 
