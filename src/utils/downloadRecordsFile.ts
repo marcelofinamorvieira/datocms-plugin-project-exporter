@@ -4,7 +4,7 @@ import { AvailableFormats } from '../entrypoints/ConfigScreen';
 import * as XLSX from 'xlsx';
 import { flatten } from 'flat';
 
-function downloadRecordsFile(records: any[], format: AvailableFormats) {
+function downloadRecordsFile(data: any, format: AvailableFormats) {
   function downloadFile(content: string, type: string, extension: string) {
     const file = new Blob([content], {
       type: type,
@@ -16,10 +16,12 @@ function downloadRecordsFile(records: any[], format: AvailableFormats) {
     element.click();
   }
 
+  const records = Array.isArray(data) ? data : data.records;
+
   switch (format) {
     case 'JSON':
       downloadFile(
-        JSON.stringify(records, null, 2),
+        JSON.stringify(data, null, 2),
         'application/json',
         'json'
       );
@@ -31,7 +33,7 @@ function downloadRecordsFile(records: any[], format: AvailableFormats) {
       downloadFile(jsontoxml(records), 'application/xml', 'xml');
       break;
     case 'XLSX':
-      const flattenedData = records.map((item, index) => {
+      const flattenedData = records.map((item: any, index: number) => {
         const flattenedItem = flatten(item) as Record<string, unknown>;
         return { [`row_${index}`]: index, ...flattenedItem };
       });

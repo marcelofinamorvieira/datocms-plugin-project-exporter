@@ -29,5 +29,14 @@ export default async function downloadAllRecords(
     records.push(record);
   }
 
-  downloadRecordsFile(records, format);
+  if (format === 'JSON') {
+    const itemTypes = await client.itemTypes.list();
+    const fields = (
+      await Promise.all(itemTypes.map((model) => client.fields.list(model.id)))
+    ).flat();
+
+    downloadRecordsFile({ records, schema: { itemTypes, fields } }, format);
+  } else {
+    downloadRecordsFile(records, format);
+  }
 }
